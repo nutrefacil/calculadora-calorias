@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calculador de Calorías — Descubre tus calorías de mantenimiento y objetivo</title>
 <meta name="description" content="Calcula tus calorías de mantenimiento y tu objetivo diario (pérdida de grasa, mantenimiento o ganancia muscular) en menos de un minuto.">
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -61,13 +62,14 @@
   .hero-mark{
     display:inline-flex;
     align-items:center;
-    gap:8px;
+    gap:10px;
     font-size:13px;
     font-weight:600;
     color:var(--primary);
     margin-bottom:18px;
   }
   .hero-mark .dot{width:7px;height:7px;border-radius:50%;background:var(--primary);display:inline-block;}
+  .hero-mark .brand-logo{width:30px; height:30px; display:block; flex-shrink:0;}
   h1.hero-title{
     font-family:'Instrument Serif', serif;
     font-weight:400;
@@ -307,7 +309,7 @@
 <div class="wrap">
 
   <header class="hero">
-    <div class="hero-mark"><span class="dot"></span>Herramienta gratuita del método</div>
+    <div class="hero-mark"><img class="brand-logo" src="logo-nutre-facil.png" alt="Nutre Fácil">Nutre Fácil · Herramienta gratuita del método</div>
     <h1 class="hero-title">¿Cuántas calorías <em>necesitas</em> al día?</h1>
     <p class="hero-sub">Rellena tus datos y descubre tus calorías de mantenimiento y tu objetivo diario en menos de un minuto.</p>
   </header>
