@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculador de Calorías — Descubre tus calorías de mantenimiento y objetivo</title>
+<meta name="description" content="Calcula tus calorías de mantenimiento y tu objetivo diario (pérdida de grasa, mantenimiento o ganancia muscular) en menos de un minuto.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF9F4;
+    --surface:#FFFFFF;
+    --ink:#1C2620;
+    --ink-soft:#5B6B60;
+    --ink-faint:#8C978E;
+    --line:#E3DFCF;
+    --primary:#1B4332;
+    --primary-dark:#122E22;
+    --primary-bg:#E9F0EA;
+
+    --fire:#C8492F;
+    --fire-bg:#FBEAE4;
+    --fire-line:#EFC3B4;
+
+    --muscle:#57713C;
+    --muscle-bg:#EBF0E1;
+    --muscle-line:#C7D6AF;
+
+    --blue:#2F6690;
+    --blue-bg:#E7EFF4;
+    --blue-line:#BFD3DF;
+
+    --radius-sm:10px;
+    --radius-md:16px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+    padding:0 20px 80px;
+  }
+
+  header.hero{
+    padding:40px 0 28px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:32px;
+  }
+  .hero-mark{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--primary);
+    margin-bottom:18px;
+  }
+  .hero-mark .dot{width:7px;height:7px;border-radius:50%;background:var(--primary);display:inline-block;}
+  h1.hero-title{
+    font-family:'Instrument Serif', serif;
+    font-weight:400;
+    font-size:40px;
+    line-height:1.1;
+    margin:0 0 14px;
+  }
+  h1.hero-title em{font-style:italic; color:var(--primary);}
+  .hero-sub{font-size:16px; color:var(--ink-soft); max-width:42ch; margin:0;}
+
+  .section{
+    padding:28px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .section-head{margin-bottom:16px;}
+  .section-title{font-size:17px; font-weight:600; margin:0 0 4px;}
+  .section-help{font-size:13px; color:var(--ink-faint); margin:0;}
+
+  /* Sexo */
+  .sex-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .choice-tile{
+    appearance:none;
+    border:1.5px solid var(--line);
+    background:var(--surface);
+    border-radius:var(--radius-md);
+    padding:16px 10px;
+    text-align:center;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .choice-tile.selected{border-color:var(--primary); background:var(--primary-bg); color:var(--primary-dark);}
+
+  /* Inputs numéricos */
+  .field-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field label{font-size:12.5px; color:var(--ink-faint); font-weight:600;}
+  input[type="number"]{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    padding:12px 12px;
+    border-radius:var(--radius-sm);
+    border:1.5px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  input[type="number"]:focus{border-color:var(--primary);}
+  input::placeholder{color:var(--ink-faint);}
+
+  /* Actividad */
+  .activity-list{display:flex; flex-direction:column; gap:10px;}
+  .activity-card{
+    appearance:none;
+    text-align:left;
+    border:1.5px solid var(--line);
+    background:var(--surface);
+    border-radius:var(--radius-md);
+    padding:14px 16px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .activity-card .t{font-size:15px; font-weight:600; color:var(--ink); display:block; margin-bottom:3px;}
+  .activity-card .d{font-size:13px; color:var(--ink-faint); display:block;}
+  .activity-card.selected{border-color:var(--primary); background:var(--primary-bg);}
+  .activity-card.selected .t{color:var(--primary-dark);}
+
+  /* Objetivo */
+  .goal-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .goal-tile{
+    appearance:none;
+    border:1.5px solid var(--line);
+    background:var(--surface);
+    border-radius:var(--radius-md);
+    padding:16px 6px 14px;
+    text-align:center;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .goal-tile .ico{font-size:24px; display:block; margin-bottom:8px;}
+  .goal-tile .label{font-size:12.5px; font-weight:600; color:var(--ink); display:block; line-height:1.25;}
+  .goal-tile[data-goal="loss"].selected{border-color:var(--fire); background:var(--fire-bg);}
+  .goal-tile[data-goal="maintain"].selected{border-color:var(--blue); background:var(--blue-bg);}
+  .goal-tile[data-goal="gain"].selected{border-color:var(--muscle); background:var(--muscle-bg);}
+
+  /* Intensidad */
+  .intensity-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .intensity-tile{
+    appearance:none;
+    border:1.5px solid var(--line);
+    background:var(--surface);
+    border-radius:var(--radius-md);
+    padding:14px 6px;
+    text-align:center;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+  }
+  .intensity-tile .dot{font-size:16px; display:block; margin-bottom:4px;}
+  .intensity-tile.selected{border-color:var(--ink); background:var(--primary-bg);}
+
+  #intensitySection{display:none;}
+  #intensitySection.show{display:block;}
+
+  /* CTA */
+  .cta{
+    width:100%;
+    margin-top:8px;
+    padding:16px;
+    border:none;
+    border-radius:var(--radius-sm);
+    background:var(--primary);
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .cta:hover{background:var(--primary-dark);}
+  .cta.secondary{
+    background:var(--surface);
+    color:var(--primary);
+    border:1.5px solid var(--primary);
+  }
+  .cta.secondary:hover{background:var(--primary-bg);}
+  .cta.disabled{
+    background:var(--line);
+    color:var(--ink-faint);
+    cursor:not-allowed;
+  }
+
+  .error-msg{
+    font-size:13px;
+    color:var(--fire);
+    margin-top:10px;
+    display:none;
+    line-height:1.5;
+  }
+  .error-msg.show{display:block;}
+
+  /* Resultados */
+  #resultsScreen{display:none;}
+  #resultsScreen.show{display:block;}
+  #formScreen.hide{display:none;}
+
+  .result-block{
+    padding:24px 20px;
+    border-radius:var(--radius-md);
+    margin-bottom:20px;
+    border:1px solid var(--line);
+  }
+  .result-block.blue{background:var(--blue-bg); border-color:var(--blue-line);}
+  .result-block.fire{background:var(--fire-bg); border-color:var(--fire-line);}
+  .result-block.muscle{background:var(--muscle-bg); border-color:var(--muscle-line);}
+
+  .result-block .tag{
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.02em;
+    margin:0 0 8px;
+  }
+  .result-block.blue .tag{color:var(--blue);}
+  .result-block.fire .tag{color:var(--fire);}
+  .result-block.muscle .tag{color:var(--muscle);}
+
+  .result-block .big{
+    font-family:'Instrument Serif', serif;
+    font-size:46px;
+    line-height:1;
+    margin:0 0 10px;
+    color:var(--ink);
+  }
+  .result-block .big span{font-size:18px; font-family:'Inter',sans-serif; font-weight:500; color:var(--ink-soft);}
+  .result-block .delta{
+    display:inline-block;
+    font-size:13px;
+    font-weight:600;
+    padding:5px 12px;
+    border-radius:999px;
+    background:var(--surface);
+    margin-bottom:10px;
+  }
+  .result-block .desc{font-size:13.5px; color:var(--ink-soft); margin:0; line-height:1.6;}
+
+  .summary-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:18px 20px;
+    margin-bottom:24px;
+  }
+  .summary-card .stitle{font-size:13px; font-weight:700; color:var(--ink-faint); margin:0 0 12px;}
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row .k{color:var(--ink-faint);}
+  .summary-row .v{font-weight:600; color:var(--ink);}
+
+  .results-actions{display:flex; flex-direction:column; gap:10px; margin-bottom:20px;}
+
+  .disclaimer{
+    font-size:12.5px;
+    color:var(--ink-faint);
+    line-height:1.6;
+    margin-top:8px;
+  }
+
+  footer.site-footer{
+    margin-top:48px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    font-size:13px;
+    color:var(--ink-faint);
+    text-align:center;
+  }
+  footer.site-footer a{color:var(--primary); text-decoration:none; font-weight:600;}
+
+  @media (max-width:380px){
+    h1.hero-title{font-size:32px;}
+    .field-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-mark"><span class="dot"></span>Herramienta gratuita del método</div>
+    <h1 class="hero-title">¿Cuántas calorías <em>necesitas</em> al día?</h1>
+    <p class="hero-sub">Rellena tus datos y descubre tus calorías de mantenimiento y tu objetivo diario en menos de un minuto.</p>
+  </header>
+
+  <!-- FORM SCREEN -->
+  <div id="formScreen">
+
+    <section class="section">
+      <div class="section-head"><p class="section-title">Sexo</p></div>
+      <div class="sex-grid">
+        <button class="choice-tile" data-sex="male" type="button">Hombre</button>
+        <button class="choice-tile" data-sex="female" type="button">Mujer</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><p class="section-title">Tus datos</p></div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="ageInput">Edad (años)</label>
+          <input type="number" id="ageInput" placeholder="30" min="18" max="100">
+        </div>
+        <div class="field">
+          <label for="weightInput">Peso (kg)</label>
+          <input type="number" id="weightInput" placeholder="70" min="1">
+        </div>
+        <div class="field">
+          <label for="heightInput">Altura (cm)</label>
+          <input type="number" id="heightInput" placeholder="170" min="1">
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <p class="section-title">Nivel de actividad</p>
+        <p class="section-help">Elige la opción que más se parezca a tu semana habitual.</p>
+      </div>
+      <div class="activity-list" id="activityList">
+        <button class="activity-card" data-activity="1.2" type="button">
+          <span class="t">Sedentario</span>
+          <span class="d">Poco o ningún ejercicio.</span>
+        </button>
+        <button class="activity-card" data-activity="1.375" type="button">
+          <span class="t">Actividad ligera</span>
+          <span class="d">Ejercicio ligero aproximadamente 1-3 días por semana.</span>
+        </button>
+        <button class="activity-card" data-activity="1.55" type="button">
+          <span class="t">Actividad moderada</span>
+          <span class="d">Ejercicio aproximadamente 3-5 días por semana.</span>
+        </button>
+        <button class="activity-card" data-activity="1.725" type="button">
+          <span class="t">Actividad alta</span>
+          <span class="d">Ejercicio intenso aproximadamente 6-7 días por semana.</span>
+        </button>
+        <button class="activity-card" data-activity="1.9" type="button">
+          <span class="t">Actividad muy alta</span>
+          <span class="d">Ejercicio muy intenso y/o trabajo físicamente activo.</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><p class="section-title">¿Cuál es tu objetivo?</p></div>
+      <div class="goal-grid">
+        <button class="goal-tile" data-goal="loss" type="button">
+          <span class="ico">🔥</span>
+          <span class="label">Perder grasa</span>
+        </button>
+        <button class="goal-tile" data-goal="maintain" type="button">
+          <span class="ico">⚖️</span>
+          <span class="label">Mantener mi peso</span>
+        </button>
+        <button class="goal-tile" data-goal="gain" type="button">
+          <span class="ico">💪</span>
+          <span class="label">Ganar masa muscular</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="section" id="intensitySection">
+      <div class="section-head"><p class="section-title">¿Qué intensidad quieres?</p></div>
+      <div class="intensity-grid" id="intensityGrid">
+        <button class="intensity-tile" data-intensity="light" type="button">
+          <span class="dot">🟢</span>Ligera
+        </button>
+        <button class="intensity-tile" data-intensity="moderate" type="button">
+          <span class="dot">🟠</span>Moderada
+        </button>
+        <button class="intensity-tile" data-intensity="severe" type="button">
+          <span class="dot">🔴</span>Severa
+        </button>
+      </div>
+    </section>
+
+    <section class="section" style="border-bottom:none; padding-bottom:0;">
+      <button class="cta" id="calcBtn" type="button">CALCULAR MIS CALORÍAS</button>
+      <p class="error-msg" id="errorMsg"></p>
+    </section>
+
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen">
+
+    <div class="result-block blue">
+      <p class="tag">🔵 CALORÍAS DE MANTENIMIENTO</p>
+      <p class="big" id="maintenanceBig"></p>
+      <p class="desc">Estas son las calorías estimadas que necesitas consumir diariamente para mantener tu peso actual teniendo en cuenta tu nivel de actividad.</p>
+    </div>
+
+    <div class="result-block" id="goalBlock">
+      <p class="tag" id="goalTag"></p>
+      <p class="big" id="goalBig"></p>
+      <p class="delta" id="goalDelta"></p>
+      <p class="desc" id="goalDesc"></p>
+    </div>
+
+    <div class="summary-card">
+      <p class="stitle">Resumen de tus datos</p>
+      <div class="summary-row"><span class="k">Sexo</span><span class="v" id="sumSex"></span></div>
+      <div class="summary-row"><span class="k">Edad</span><span class="v" id="sumAge"></span></div>
+      <div class="summary-row"><span class="k">Peso</span><span class="v" id="sumWeight"></span></div>
+      <div class="summary-row"><span class="k">Altura</span><span class="v" id="sumHeight"></span></div>
+      <div class="summary-row"><span class="k">Actividad</span><span class="v" id="sumActivity"></span></div>
+      <div class="summary-row"><span class="k">Objetivo</span><span class="v" id="sumGoal"></span></div>
+      <div class="summary-row"><span class="k">Intensidad</span><span class="v" id="sumIntensity"></span></div>
+    </div>
+
+    <div class="results-actions">
+      <button class="cta secondary" id="recalcBtn" type="button">🔄 VOLVER A CALCULAR</button>
+      <button class="cta disabled" id="recipeBtn" type="button" disabled>🍳 CREAR MI PRIMERA RECETA — Próximamente</button>
+    </div>
+
+    <p class="disclaimer">Este cálculo es una estimación basada en tus datos introducidos y no sustituye el asesoramiento de un profesional de la salud o la nutrición. Las necesidades energéticas reales pueden variar entre personas.</p>
+
+  </div>
+
+  <footer class="site-footer">
+    Parte del método para comer saludable sin complicarte.<br>
+    <a href="#">Volver al ebook</a>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+
+  var state = {
+    sex: null,
+    activity: null,
+    goal: null,
+    intensity: null
+  };
+
+  var ACTIVITY_LABELS = {
+    '1.2': 'Sedentario',
+    '1.375': 'Actividad ligera',
+    '1.55': 'Actividad moderada',
+    '1.725': 'Actividad alta',
+    '1.9': 'Actividad muy alta'
+  };
+
+  var GOAL_LABELS = { loss:'Perder grasa', maintain:'Mantener mi peso', gain:'Ganar masa muscular' };
+  var INTENSITY_LABELS = { light:'Ligera', moderate:'Moderada', severe:'Severa' };
+  var INTENSITY_KCAL = { light:250, moderate:500, severe:750 };
+
+  // ---- Sexo ----
+  var sexTiles = document.querySelectorAll('.choice-tile[data-sex]');
+  sexTiles.forEach(function(tile){
+    tile.addEventListener('click', function(){
+      sexTiles.forEach(function(t){ t.classList.remove('selected'); });
+      tile.classList.add('selected');
+      state.sex = tile.getAttribute('data-sex');
+    });
+  });
+
+  // ---- Actividad ----
+  var activityCards = document.querySelectorAll('.activity-card');
+  activityCards.forEach(function(card){
+    card.addEventListener('click', function(){
+      activityCards.forEach(function(c){ c.classList.remove('selected'); });
+      card.classList.add('selected');
+      state.activity = card.getAttribute('data-activity');
+    });
+  });
+
+  // ---- Objetivo ----
+  var goalTiles = document.querySelectorAll('.goal-tile');
+  var intensitySection = document.getElementById('intensitySection');
+  var intensityTiles = document.querySelectorAll('.intensity-tile');
+
+  goalTiles.forEach(function(tile){
+    tile.addEventListener('click', function(){
+      goalTiles.forEach(function(t){ t.classList.remove('selected'); });
+      tile.classList.add('selected');
+      state.goal = tile.getAttribute('data-goal');
+
+      if(state.goal === 'maintain'){
+        intensitySection.classList.remove('show');
+        state.intensity = null;
+        intensityTiles.forEach(function(t){ t.classList.remove('selected'); });
+      } else {
+        intensitySection.classList.add('show');
+      }
+    });
+  });
+
+  intensityTiles.forEach(function(tile){
+    tile.addEventListener('click', function(){
+      intensityTiles.forEach(function(t){ t.classList.remove('selected'); });
+      tile.classList.add('selected');
+      state.intensity = tile.getAttribute('data-intensity');
+    });
+  });
+
+  // ---- Cálculo ----
+  var calcBtn = document.getElementById('calcBtn');
+  var errorMsg = document.getElementById('errorMsg');
+
+  function fmtInt(n){
+    return Math.round(n).toLocaleString('es-ES');
+  }
+
+  calcBtn.addEventListener('click', function(){
+    var age = parseFloat(document.getElementById('ageInput').value);
+    var weight = parseFloat(document.getElementById('weightInput').value);
+    var height = parseFloat(document.getElementById('heightInput').value);
+
+    var errors = [];
+    if(!state.sex) errors.push('Selecciona tu sexo.');
+    if(!age || age < 18 || age > 100) errors.push('Introduce una edad entre 18 y 100 años.');
+    if(!weight || weight <= 0 || weight > 300) errors.push('Introduce un peso válido en kg.');
+    if(!height || height <= 0 || height > 250) errors.push('Introduce una altura válida en cm.');
+    if(!state.activity) errors.push('Selecciona tu nivel de actividad.');
+    if(!state.goal) errors.push('Selecciona tu objetivo.');
+    if(state.goal && state.goal !== 'maintain' && !state.intensity) errors.push('Selecciona la intensidad de tu objetivo.');
+
+    if(errors.length > 0){
+      errorMsg.innerHTML = errors.join('<br>');
+      errorMsg.classList.add('show');
+      return;
+    }
+    errorMsg.classList.remove('show');
+
+    // BMR — Harris-Benedict revisada (Roza y Shizgal, 1984)
+    var bmr;
+    if(state.sex === 'male'){
+      bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+    } else {
+      bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+    }
+
+    var maintenance = bmr * parseFloat(state.activity);
+    var goalKcal = maintenance;
+    var deltaKcal = 0;
+
+    if(state.goal === 'loss'){
+      deltaKcal = INTENSITY_KCAL[state.intensity];
+      goalKcal = maintenance - deltaKcal;
+    } else if(state.goal === 'gain'){
+      deltaKcal = INTENSITY_KCAL[state.intensity];
+      goalKcal = maintenance + deltaKcal;
+    }
+
+    renderResults(maintenance, goalKcal, deltaKcal, weight, height, age);
+  });
+
+  function renderResults(maintenance, goalKcal, deltaKcal, weight, height, age){
+    document.getElementById('maintenanceBig').innerHTML = fmtInt(maintenance) + ' <span>kcal/día</span>';
+
+    var goalBlock = document.getElementById('goalBlock');
+    var goalTag = document.getElementById('goalTag');
+    var goalBig = document.getElementById('goalBig');
+    var goalDelta = document.getElementById('goalDelta');
+    var goalDesc = document.getElementById('goalDesc');
+
+    goalBlock.className = 'result-block';
+    goalBig.innerHTML = fmtInt(goalKcal) + ' <span>kcal/día</span>';
+
+    if(state.goal === 'loss'){
+      goalBlock.classList.add('fire');
+      goalTag.textContent = '🔥 TU OBJETIVO';
+      goalDelta.textContent = 'Déficit ' + INTENSITY_LABELS[state.intensity].toLowerCase() + ': −' + fmtInt(deltaKcal) + ' kcal/día';
+      goalDesc.textContent = 'Este objetivo busca una pérdida de grasa progresiva manteniendo la energía necesaria para tu día a día.';
+    } else if(state.goal === 'gain'){
+      goalBlock.classList.add('muscle');
+      goalTag.textContent = '💪 TU OBJETIVO';
+      goalDelta.textContent = 'Superávit ' + INTENSITY_LABELS[state.intensity].toLowerCase() + ': +' + fmtInt(deltaKcal) + ' kcal/día';
+      goalDesc.textContent = 'Este objetivo aporta la energía extra necesaria para favorecer la ganancia de masa muscular.';
+    } else {
+      goalBlock.classList.add('blue');
+      goalTag.textContent = '⚖️ TU OBJETIVO';
+      goalDelta.textContent = 'Mantenimiento: sin déficit ni superávit';
+      goalDesc.textContent = 'Consumiendo estas calorías, tu peso debería mantenerse estable con tu nivel de actividad actual.';
+    }
+
+    document.getElementById('sumSex').textContent = state.sex === 'male' ? 'Hombre' : 'Mujer';
+    document.getElementById('sumAge').textContent = age + ' años';
+    document.getElementById('sumWeight').textContent = weight + ' kg';
+    document.getElementById('sumHeight').textContent = height + ' cm';
+    document.getElementById('sumActivity').textContent = ACTIVITY_LABELS[state.activity];
+    document.getElementById('sumGoal').textContent = GOAL_LABELS[state.goal];
+    document.getElementById('sumIntensity').textContent = state.intensity ? INTENSITY_LABELS[state.intensity] : '—';
+
+    document.getElementById('formScreen').classList.add('hide');
+    document.getElementById('resultsScreen').classList.add('show');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  document.getElementById('recalcBtn').addEventListener('click', function(){
+    document.getElementById('resultsScreen').classList.remove('show');
+    document.getElementById('formScreen').classList.remove('hide');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+})();
+</script>
+
+</body>
+</html>
